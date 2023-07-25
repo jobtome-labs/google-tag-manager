@@ -1,0 +1,14 @@
+{{- if .Values.serverSideTagging.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: sst-{{ include "google-tag-manager.fullname" . }}
+  labels:
+    {{- include "google-tag-manager.labels" . | nindent 4 }}
+spec:
+  maxUnavailable: {{ .Values.serverSideTagging.pdb.maxUnavailable }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: server-side-tagging
+      {{- include "google-tag-manager.selectorLabels" . | nindent 6 }}
+{{- end }}

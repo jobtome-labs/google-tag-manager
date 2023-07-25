@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ps-{{ include "google-tag-manager.fullname" . }}
+  labels:
+    {{- include "google-tag-manager.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.previewServer.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: preview-server
+      {{- include "google-tag-manager.selectorLabels" . | nindent 6 }}
+  strategy:
+    {{- toYaml .Values.previewServer.strategy | nindent 4 }}
+  template:
+    metadata:
+      {{- with .Values.previewServer.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/instance: preview-server
+        {{- include "google-tag-manager.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.previewServer.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.previewServer.serviceAccount.create }}
+      serviceAccountName: {{ default (printf "ps-%s" (include "google-tag-manager.fullname" .)) .Values.previewServer.serviceAccount.name }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.previewServer.podSecurityContext | nindent 8 }}
+      containers:
+        - name: preview-server
+          securityContext:
+            {{- toYaml .Values.previewServer.securityContext | nindent 12 }}
+          image: "{{ .Values.previewServer.image.repository }}:{{ .Values.previewServer.image.tag }}"
+          imagePullPolicy: {{ .Values.previewServer.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.previewServer.service.port }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.previewServer.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.previewServer.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.previewServer.resources | nindent 12 }}
+          env:
+            - name: RUN_AS_PREVIEW_SERVER
+              value: "true"
+          envFrom:
+            - configMapRef:
+                name: ps-{{ include "google-tag-manager.fullname" . }}
+            - secretRef:
+                name: ps-{{ include "google-tag-manager.fullname" . }}
+      {{- with .Values.previewServer.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.previewServer.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.previewServer.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

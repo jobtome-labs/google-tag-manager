@@ -1,0 +1,32 @@
+{{- if .Values.serverSideTagging.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sst-{{ include "google-tag-manager.fullname" . }}
+  labels:
+    {{- include "google-tag-manager.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sst-{{ include "google-tag-manager.fullname" . }}
+  minReplicas: {{ .Values.serverSideTagging.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.serverSideTagging.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.serverSideTagging.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.serverSideTagging.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.serverSideTagging.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.serverSideTagging.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

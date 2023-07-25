@@ -1,0 +1,14 @@
+{{- if .Values.previewServer.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ps-{{ include "google-tag-manager.fullname" . }}
+  labels:
+    {{- include "google-tag-manager.labels" . | nindent 4 }}
+spec:
+  maxUnavailable: {{ .Values.previewServer.pdb.maxUnavailable }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: preview-server
+      {{- include "google-tag-manager.selectorLabels" . | nindent 6 }}
+{{- end }}

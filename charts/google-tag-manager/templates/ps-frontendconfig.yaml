@@ -1,0 +1,16 @@
+{{- if .Values.previewServer.frontendConfig.enabled }}
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: ps-{{ include "google-tag-manager.fullname" . }}
+  labels:
+    {{- include "google-tag-manager.labels" . | nindent 4 }}
+spec:
+  {{- if hasKey .Values.previewServer.frontendConfig "sslPolicy" }}
+  sslPolicy: {{ .Values.previewServer.frontendConfig.sslPolicy }}
+  {{- end }}
+  {{- with .Values.previewServer.frontendConfig.redirectToHttps }}
+  redirectToHttps:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
