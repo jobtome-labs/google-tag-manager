@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sst-{{ include "google-tag-manager.fullname" . }}
+  labels:
+    {{- include "google-tag-manager.labels" . | nindent 4 }}
+  {{- if or .Values.serverSideTagging.service.neg.enabled .Values.serverSideTagging.backendConfig.enabled }}
+  annotations:
+  {{- if .Values.serverSideTagging.service.neg.enabled }}
+    cloud.google.com/neg: '{"exposed_ports": {"{{ .Values.serverSideTagging.service.port }}":{}}}'
+  {{- end }}
+  {{- if .Values.serverSideTagging.backendConfig.enabled }}
+    cloud.google.com/backend-config: '{"default": "sst-{{ include "google-tag-manager.fullname" . }}"}'
+  {{- end }}
+  {{- end }}
+spec:
+  type: {{ .Values.serverSideTagging.service.type }}
+  ports:
+    - port: {{ .Values.serverSideTagging.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/instance: server-side-tagging
+    {{- include "google-tag-manager.selectorLabels" . | nindent 4 }}

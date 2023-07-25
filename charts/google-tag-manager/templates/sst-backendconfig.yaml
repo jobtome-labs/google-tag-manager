@@ -1,0 +1,20 @@
+{{- if .Values.serverSideTagging.backendConfig.enabled }}
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: sst-{{ include "google-tag-manager.fullname" . }}
+  labels:
+    {{- include "google-tag-manager.labels" . | nindent 4 }}
+spec:
+  {{- if hasKey .Values.serverSideTagging.backendConfig "timeoutSec" }}
+  timeoutSec: {{ .Values.serverSideTagging.backendConfig.timeoutSec }}
+  {{- end }}
+  {{- with .Values.serverSideTagging.backendConfig.healthCheck }}
+  healthCheck:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.serverSideTagging.backendConfig.securityPolicy }}
+  securityPolicy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
