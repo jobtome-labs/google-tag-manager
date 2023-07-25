@@ -1,0 +1,40 @@
+{{- if .Values.serverSideTagging.testConnection.internal.enabled -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sst-{{ include "google-tag-manager.fullname" . }}-internal-test-connection
+  labels:
+    {{- include "google-tag-manager.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  containers:
+    - name: wget
+      image: busybox:1.36
+      command: [ "wget" ]
+      args: [ '{{ printf "sst-%s" (include "google-tag-manager.fullname" .) }}:{{ .Values.serverSideTagging.service.port }}{{ .Values.serverSideTagging.readinessProbe.httpGet.path }}' ]
+  restartPolicy: Never
+{{- end }}
+
+{{- if and .Values.serverSideTagging.testConnection.external.enabled .Values.serverSideTagging.ingress.enabled -}}
+{{- range .Values.serverSideTagging.ingress.hosts }}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .host | replace "." "-" | trunc 34 }}-sst-external-test-connection
+  labels:
+    {{- include "google-tag-manager.labels" $ | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  containers:
+    - name: wget
+      image: busybox:1.36
+      command: [ "wget" ]
+      args: [ 'https://{{ .host }}{{ $.Values.serverSideTagging.readinessProbe.httpGet.path }}' ]
+  restartPolicy: Never
+{{- end }}
+{{- end }}

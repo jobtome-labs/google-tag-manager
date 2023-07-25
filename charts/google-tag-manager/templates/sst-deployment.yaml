@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sst-{{ include "google-tag-manager.fullname" . }}
+  labels:
+    {{- include "google-tag-manager.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.serverSideTagging.autoscaling.enabled }}
+  replicas: {{ .Values.serverSideTagging.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: server-side-tagging
+      {{- include "google-tag-manager.selectorLabels" . | nindent 6 }}
+  strategy:
+    {{- toYaml .Values.serverSideTagging.strategy | nindent 4 }}
+  template:
+    metadata:
+      {{- with .Values.serverSideTagging.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/instance: server-side-tagging
+        {{- include "google-tag-manager.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.serverSideTagging.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.serverSideTagging.serviceAccount.create }}
+      serviceAccountName: {{ default (printf "sst-%s" (include "google-tag-manager.fullname" .)) .Values.serverSideTagging.serviceAccount.name }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.serverSideTagging.podSecurityContext | nindent 8 }}
+      containers:
+        - name: server-side-tagging
+          securityContext:
+            {{- toYaml .Values.serverSideTagging.securityContext | nindent 12 }}
+          image: "{{ .Values.serverSideTagging.image.repository }}:{{ .Values.serverSideTagging.image.tag }}"
+          imagePullPolicy: {{ .Values.serverSideTagging.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.serverSideTagging.service.port }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.serverSideTagging.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.serverSideTagging.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.serverSideTagging.resources | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: sst-{{ include "google-tag-manager.fullname" . }}
+            - secretRef:
+                name: sst-{{ include "google-tag-manager.fullname" . }}
+      {{- with .Values.serverSideTagging.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.serverSideTagging.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.serverSideTagging.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

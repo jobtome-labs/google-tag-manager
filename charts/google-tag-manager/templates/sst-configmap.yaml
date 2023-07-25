@@ -1,0 +1,9 @@
+{{- $_ := set .Values.serverSideTagging.environment "PREVIEW_SERVER_URL" .Values.serverSideTagging.previewServerUrl }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sst-{{ include "google-tag-manager.fullname" . }}
+  labels:
+    {{- include "google-tag-manager.labels" . | nindent 4 }}
+data:
+  {{- toYaml .Values.serverSideTagging.environment | nindent 2 }}

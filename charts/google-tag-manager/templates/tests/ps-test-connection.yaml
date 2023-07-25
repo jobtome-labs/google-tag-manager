@@ -1,0 +1,40 @@
+{{- if .Values.previewServer.testConnection.internal.enabled -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ps-{{ include "google-tag-manager.fullname" . }}-internal-test-connection
+  labels:
+    {{- include "google-tag-manager.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  containers:
+    - name: wget
+      image: busybox:1.36
+      command: [ "wget" ]
+      args: [ '{{ printf "ps-%s" (include "google-tag-manager.fullname" .) }}:{{ .Values.previewServer.service.port }}{{ .Values.previewServer.readinessProbe.httpGet.path }}' ]
+  restartPolicy: Never
+{{- end }}
+
+{{- if and .Values.previewServer.testConnection.external.enabled .Values.previewServer.ingress.enabled -}}
+{{- range .Values.previewServer.ingress.hosts }}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .host | replace "." "-" | trunc 34 }}-ps-external-test-connection
+  labels:
+    {{- include "google-tag-manager.labels" $ | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  containers:
+    - name: wget
+      image: busybox:1.36
+      command: [ "wget" ]
+      args: [ 'https://{{ .host }}{{ $.Values.previewServer.readinessProbe.httpGet.path }}' ]
+  restartPolicy: Never
+{{- end }}
+{{- end }}
