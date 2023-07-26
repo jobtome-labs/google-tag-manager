@@ -1,3 +1,5 @@
+{{- $_ := set .Values.previewServer.podAnnotations "checksum/config" (include (print $.Template.BasePath "/ps-configmap.yaml") . | sha256sum) }}
+{{- $_ := set .Values.previewServer.podAnnotations "checksum/secret" (include (print $.Template.BasePath "/ps-secret.yaml") . | sha256sum) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

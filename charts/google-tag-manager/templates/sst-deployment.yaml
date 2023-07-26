@@ -1,3 +1,5 @@
+{{- $_ := set .Values.serverSideTagging.podAnnotations "checksum/config" (include (print $.Template.BasePath "/sst-configmap.yaml") . | sha256sum) }}
+{{- $_ := set .Values.serverSideTagging.podAnnotations "checksum/secret" (include (print $.Template.BasePath "/sst-secret.yaml") . | sha256sum) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
