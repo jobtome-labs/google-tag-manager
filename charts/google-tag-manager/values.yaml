@@ -99,7 +99,7 @@ previewServer:
       - host: chart-example.local
         paths:
           - path: /
-            pathType: ImplementationSpecific
+            pathType: Prefix
 
     tls:
       []
@@ -248,7 +248,7 @@ serverSideTagging:
       - host: chart-example.local
         paths:
           - path: /
-            pathType: ImplementationSpecific
+            pathType: Prefix
 
     tls:
       []

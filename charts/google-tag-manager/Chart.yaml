@@ -6,7 +6,7 @@ type: application
 name: google-tag-manager
 description: A Helm Chart for Google Tag Manager
 
-version: "0.2.1"
+version: "0.2.2"
 appVersion: "1.16.0"
 
 keywords:
