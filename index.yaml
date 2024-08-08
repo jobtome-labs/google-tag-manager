@@ -3,6 +3,30 @@ entries:
   google-tag-manager:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2024-08-08T06:13:29.73966277Z"
+    description: A Helm Chart for Google Tag Manager
+    digest: 19693f15b0d8add05f192472a3b3581dedafe4799018016619ba300293bc538d
+    home: https://github.com/jobtome-labs/google-tag-manager
+    icon: https://www.gstatic.com/analytics-suite/header/suite/v2/ic_tag_manager.svg
+    keywords:
+    - google
+    - tag
+    - manager
+    - tagmanager
+    - analytics
+    - advertising
+    maintainers:
+    - email: daniel.toncu@jobtome.com
+      name: Daniel Țoncu
+    name: google-tag-manager
+    sources:
+    - https://github.com/jobtome-labs/google-tag-manager
+    type: application
+    urls:
+    - https://github.com/jobtome-labs/google-tag-manager/releases/download/google-tag-manager-0.3.0/google-tag-manager-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2023-09-28T07:40:49.320686499Z"
     description: A Helm Chart for Google Tag Manager
     digest: 094fc4027ff745be7d01e37655371cf3f0967dce5b94d78bba0a3f5378b95824
@@ -146,4 +170,4 @@ entries:
     urls:
     - https://github.com/jobtome-labs/google-tag-manager/releases/download/google-tag-manager-0.1.0/google-tag-manager-0.1.0.tgz
     version: 0.1.0
-generated: "2023-09-28T07:40:49.320986904Z"
+generated: "2024-08-08T06:13:29.739695231Z"
